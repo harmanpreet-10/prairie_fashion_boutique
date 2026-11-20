@@ -6,6 +6,7 @@
     Discover affordable fashion, timeless styles,
     and everyday essentials.
   </p>
+
   <%= link_to "Shop Collection", "#collection",
       class: "shop-button" %>
 </section>
@@ -37,6 +38,16 @@
             ["In Stock Only", "in_stock"]
           ],
           params[:availability]
+        ) %>
+
+    <%= form.select :filter,
+        options_for_select(
+          [
+            ["All Collections", "all"],
+            ["Newly Added Products", "new"],
+            ["Recently Updated Products", "updated"]
+          ],
+          params[:filter]
         ) %>
 
     <%= form.select :sort,
@@ -79,7 +90,7 @@
   <% else %>
     <div class="empty-state">
       <h3>No products found</h3>
-      <p>Try another search or category.</p>
+      <p>Try changing your search or filters.</p>
       <%= link_to "View All Products", products_path %>
     </div>
   <% end %>
