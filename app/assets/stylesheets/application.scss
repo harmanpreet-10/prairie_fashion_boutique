@@ -1,1 +1,279 @@
-// Sassy
+
+$primary: #542c43;
+$accent: #b96886;
+$light: #fff5f8;
+$text: #29232a;
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: $text;
+  line-height: 1.6;
+}
+
+a {
+  color: $primary;
+}
+
+.site-header {
+  background: #ffffff;
+  padding: 20px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.nav-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+
+  .brand {
+    font-size: 23px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-decoration: none;
+  }
+
+  nav {
+    display: flex;
+    gap: 22px;
+    flex-wrap: wrap;
+
+    a {
+      text-decoration: none;
+      font-weight: 600;
+
+      &:hover {
+        color: $accent;
+      }
+    }
+  }
+}
+
+.hero {
+  text-align: center;
+  padding: 90px 20px;
+  background: linear-gradient(135deg, #f7dce6, #fff7f9);
+
+  h1 {
+    font-size: clamp(32px, 5vw, 54px);
+    color: $primary;
+    margin: 12px 0;
+  }
+
+  p {
+    max-width: 650px;
+    margin: 12px auto 25px;
+  }
+}
+
+.eyebrow,
+.category-label {
+  color: $accent;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.store-container {
+  max-width: 1200px;
+  margin: 45px auto;
+  padding: 0 20px;
+}
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-form {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 25px 0;
+
+  input,
+  select {
+    padding: 12px;
+    border: 1px solid #dddddd;
+    border-radius: 7px;
+    font-size: 14px;
+    max-width: 100%;
+  }
+
+  input[type="search"] {
+    flex: 1;
+    min-width: 190px;
+  }
+}
+
+.shop-button,
+.details-button {
+  display: inline-block;
+  background: $primary;
+  color: #ffffff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 7px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background: $accent;
+    color: #ffffff;
+  }
+}
+
+.clear-button {
+  padding: 12px;
+}
+
+.result-count {
+  color: #666666;
+  margin: 20px 0;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 24px;
+}
+
+.product-card {
+  border: 1px solid #eeeeee;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
+}
+
+.product-placeholder {
+  background: $light;
+  min-height: 210px;
+  padding: 25px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: $primary;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.product-info {
+  padding: 20px;
+
+  h2,
+  h3 {
+    margin: 8px 0;
+    font-size: 19px;
+  }
+}
+
+.price {
+  font-size: 23px;
+  color: $primary;
+  font-weight: 800;
+}
+
+.stock {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.in-stock {
+  color: #247c43;
+}
+
+.out-of-stock {
+  color: #bd3030;
+}
+
+.details-button {
+  margin-top: 10px;
+}
+
+.breadcrumbs {
+  margin-bottom: 30px;
+  color: #777777;
+}
+
+.product-detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 45px;
+}
+
+.detail-placeholder {
+  min-height: 420px;
+}
+
+.detail-info {
+  h1 {
+    font-size: 36px;
+    color: $primary;
+  }
+}
+
+.empty-state {
+  padding: 50px 20px;
+  background: $light;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.flash-message {
+  padding: 15px 25px;
+  background: $light;
+  color: $primary;
+}
+
+.site-footer {
+  margin-top: 70px;
+  padding: 35px 20px;
+  background: $primary;
+  color: #ffffff;
+  text-align: center;
+
+  p {
+    margin: 5px;
+  }
+}
+
+@media (max-width: 650px) {
+  .nav-container {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-form {
+    flex-direction: column;
+
+    input,
+    select {
+      width: 100%;
+    }
+  }
+
+  .product-detail {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    padding: 60px 20px;
+  }
+}
