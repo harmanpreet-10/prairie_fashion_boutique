@@ -15,6 +15,10 @@ Rails.application.routes.draw do
     delete "clear", to: "carts#clear"
   end
 
+  resources :orders, only: [:new, :create, :show]
+
+  get "checkout", to: "orders#new", as: :checkout
+
   get "up" => "rails/health#show",
       as: :rails_health_check
 end

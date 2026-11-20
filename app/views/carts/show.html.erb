@@ -15,10 +15,12 @@
         <article class="cart-item">
           <div>
             <h2><%= product.name %></h2>
+
             <p>
               Unit Price:
               <%= number_to_currency(product.price) %>
             </p>
+
             <p>
               Available Stock:
               <%= product.stock_quantity %>
@@ -37,7 +39,9 @@
                   value: item[:quantity],
                   min: 0,
                   max: product.stock_quantity,
-                  aria: { label: "Quantity for #{product.name}" } %>
+                  aria: {
+                    label: "Quantity for #{product.name}"
+                  } %>
 
               <%= form.submit "Update",
                   class: "shop-button" %>
@@ -73,6 +77,10 @@
 
       <p>Taxes and shipping are not included.</p>
 
+      <%= link_to "Proceed to Checkout",
+          checkout_path,
+          class: "shop-button" %>
+
       <%= link_to "Continue Shopping",
           products_path,
           class: "shop-button" %>
@@ -85,7 +93,10 @@
   <% else %>
     <div class="empty-state">
       <h2>Your shopping cart is empty</h2>
-      <p>Explore our collection and add something you love.</p>
+
+      <p>
+        Explore our collection and add something you love.
+      </p>
 
       <%= link_to "Shop Now",
           products_path,

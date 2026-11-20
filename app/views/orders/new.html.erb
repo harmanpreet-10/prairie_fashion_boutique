@@ -1,0 +1,68 @@
+
+<main class="store-container">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <%= link_to "Home", root_path %> /
+    <%= link_to "Shopping Cart", cart_path %> /
+    <span>Checkout</span>
+  </nav>
+
+  <h1>Checkout</h1>
+  <p>Complete your information to place your order.</p>
+
+  <% if @order.errors.any? %>
+    <div class="empty-state">
+      <h2>Please correct the following errors:</h2>
+      <ul>
+        <% @order.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form_with model: @order, url: orders_path do |form| %>
+    <section class="cart-summary">
+      <h2>Customer Information</h2>
+
+      <p>
+        <%= form.label :customer_name, "Full Name" %>
+        <%= form.text_field :customer_name, required: true %>
+      </p>
+
+      <p>
+        <%= form.label :email, "Email Address" %>
+        <%= form.email_field :email, required: true %>
+      </p>
+
+      <p>
+        <%= form.label :shipping_address, "Shipping Address" %>
+        <%= form.text_area :shipping_address,
+              rows: 4, required: true %>
+      </p>
+
+      <h2>Order Summary</h2>
+
+      <% @cart_items.each do |item| %>
+        <p>
+          <%= item[:product].name %>
+          × <%= item[:quantity] %>
+          — <%= number_to_currency(item[:line_total]) %>
+        </p>
+      <% end %>
+
+      <h2>
+        Order Total:
+        <%= number_to_currency(@subtotal) %>
+      </h2>
+
+      <p>Taxes and shipping are not included.</p>
+
+      <%= form.submit "Place Order",
+            class: "shop-button" %>
+    </section>
+  <% end %>
+
+  <p>
+    <%= link_to "Back to Cart", cart_path %>
+  </p>
+</main>
