@@ -1,0 +1,59 @@
+
+<section class="hero">
+  <p class="eyebrow">NEW SEASON COLLECTION</p>
+  <h1>Welcome to Prairie Fashion Boutique</h1>
+  <p>Discover affordable fashion, timeless styles, and everyday essentials.</p>
+  <a href="#collection" class="shop-button">Shop Collection</a>
+</section>
+
+<main class="store-container" id="collection">
+  <h2>Explore Our Collection</h2>
+
+  <%= form_with url: products_path, method: :get, class: "filter-form" do |form| %>
+    <%= form.search_field :search,
+        value: params[:search],
+        placeholder: "Search fashion products..." %>
+
+    <%= form.select :category_id,
+        options_from_collection_for_select(
+          @categories, :id, :name, params[:category_id]
+        ),
+        { include_blank: "All Categories" } %>
+
+    <%= form.select :sort,
+        options_for_select([
+          ["Name", "name"],
+          ["Price: Low to High", "price_low"],
+          ["Price: High to Low", "price_high"],
+          ["Newest", "newest"]
+        ], params[:sort]) %>
+
+    <%= form.submit "Search", class: "shop-button" %>
+  <% end %>
+
+  <p><%= @products.size %> products found</p>
+
+  <div class="product-grid">
+    <% @products.each do |product| %>
+      <article class="product-card">
+        <div class="product-placeholder">Prairie Fashion</div>
+        <div class="product-info">
+          <p class="category-label">
+            <%= product.category.name %>
+          </p>
+          <h3><%= product.name %></h3>
+          <p class="price">
+            <%= number_to_currency(product.price) %>
+          </p>
+          <%= link_to "View Details",
+              product_path(product),
+              class: "details-button" %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+
+  <% if @products.empty? %>
+    <p>No matching products found.</p>
+  <% end %>
+</main>

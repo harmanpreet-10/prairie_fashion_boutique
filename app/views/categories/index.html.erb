@@ -1,0 +1,21 @@
+
+<main class="store-container">
+  <h1>Shop by Category</h1>
+  <p>Explore our fashion collections.</p>
+
+  <div class="product-grid">
+    <% @categories.each do |category| %>
+      <article class="product-card">
+        <div class="product-info">
+          <h2><%= category.name %></h2>
+          <p><%= category.description %></p>
+          <p><%= category.products.count %> products</p>
+
+          <%= link_to "Explore Category",
+              category_path(category),
+              class: "details-button" %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+</main>

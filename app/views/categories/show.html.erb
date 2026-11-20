@@ -1,0 +1,26 @@
+
+<main class="store-container">
+  <p>
+    <%= link_to "Home", root_path %> /
+    <%= link_to "Categories", categories_path %> /
+    <%= @category.name %>
+  </p>
+
+  <h1><%= @category.name %></h1>
+  <p><%= @category.description %></p>
+
+  <div class="product-grid">
+    <% @products.each do |product| %>
+      <article class="product-card">
+        <div class="product-info">
+          <h2><%= product.name %></h2>
+          <p><%= number_to_currency(product.price) %></p>
+
+          <%= link_to "View Details",
+              product_path(product),
+              class: "details-button" %>
+        </div>
+      </article>
+    <% end %>
+  </div>
+</main>
