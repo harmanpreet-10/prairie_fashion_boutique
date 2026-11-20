@@ -2,14 +2,24 @@
 <section class="hero">
   <p class="eyebrow">NEW SEASON COLLECTION</p>
   <h1>Welcome to Prairie Fashion Boutique</h1>
-  <p>Discover affordable fashion, timeless styles, and everyday essentials.</p>
-  <a href="#collection" class="shop-button">Shop Collection</a>
+  <p>
+    Discover affordable fashion, timeless styles,
+    and everyday essentials.
+  </p>
+  <%= link_to "Shop Collection", "#collection",
+      class: "shop-button" %>
 </section>
 
 <main class="store-container" id="collection">
-  <h2>Explore Our Collection</h2>
+  <div class="section-heading">
+    <h2>Explore Our Collection</h2>
+    <%= link_to "Shop by Category", categories_path %>
+  </div>
 
-  <%= form_with url: products_path, method: :get, class: "filter-form" do |form| %>
+  <%= form_with url: products_path,
+      method: :get,
+      class: "filter-form" do |form| %>
+
     <%= form.search_field :search,
         value: params[:search],
         placeholder: "Search fashion products..." %>
@@ -20,40 +30,82 @@
         ),
         { include_blank: "All Categories" } %>
 
+    <%= form.select :availability,
+        options_for_select(
+          [
+            ["All Products", "all"],
+            ["In Stock Only", "in_stock"]
+          ],
+          params[:availability]
+        ) %>
+
     <%= form.select :sort,
-        options_for_select([
-          ["Name", "name"],
-          ["Price: Low to High", "price_low"],
-          ["Price: High to Low", "price_high"],
-          ["Newest", "newest"]
-        ], params[:sort]) %>
+        options_for_select(
+          [
+            ["Name", "name"],
+            ["Price: Low to High", "price_low"],
+            ["Price: High to Low", "price_high"],
+            ["Newest First", "newest"]
+          ],
+          params[:sort]
+        ) %>
 
     <%= form.submit "Search", class: "shop-button" %>
+    <%= link_to "Clear Filters", products_path,
+        class: "clear-button" %>
   <% end %>
 
-  <p><%= @products.size %> products found</p>
+  <p class="result-count">
+    <%= pluralize(@products.total_count, "product") %> found
+  </p>
 
-  <div class="product-grid">
-    <% @products.each do |product| %>
-      <article class="product-card">
-        <div class="product-placeholder">Prairie Fashion</div>
-        <div class="product-info">
-          <p class="category-label">
-            <%= product.category.name %>
-          </p>
-          <h3><%= product.name %></h3>
-          <p class="price">
-            <%= number_to_currency(product.price) %>
-          </p>
-          <%= link_to "View Details",
-              product_path(product),
-              class: "details-button" %>
-        </div>
-      </article>
-    <% end %>
-  </div>
+  <% if @products.any? %>
+    <div class="product-grid">
+      <% @products.each do |product| %>
+        <article class="product-card">
+          <div class="product-placeholder">
+            Prairie Fashion
+          </div>
 
-  <% if @products.empty? %>
-    <p>No matching products found.</p>
+          <div class="product-info">
+            <p class="category-label">
+              <%= product.category.name %>
+            </p>
+
+            <h3><%= product.name %></h3>
+
+            <p class="price">
+              <%= number_to_currency(product.price) %>
+            </p>
+
+            <% if product.stock_quantity.positive? %>
+              <p class="stock in-stock">In Stock</p>
+            <% else %>
+              <p class="stock out-of-stock">Out of Stock</p>
+            <% end %>
+
+            <%= link_to "View Details",
+                product_path(product),
+                class: "details-button" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+
+    <div class="pagination-container">
+      <%= paginate @products,
+          params: request.query_parameters.except("page") %>
+    </div>
+
+    <p class="result-count">
+      Page <%= @products.current_page %>
+      of <%= @products.total_pages %>
+    </p>
+  <% else %>
+    <div class="empty-state">
+      <h3>No products found</h3>
+      <p>Try another search or category.</p>
+      <%= link_to "View All Products", products_path %>
+    </div>
   <% end %>
 </main>
