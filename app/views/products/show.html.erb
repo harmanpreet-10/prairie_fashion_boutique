@@ -1,11 +1,14 @@
 
 <main class="store-container">
   <nav class="breadcrumbs" aria-label="Breadcrumb">
-    <%= link_to "Home", root_path %> /
-    <%= link_to "Categories", categories_path %> /
+    <%= link_to "Home", root_path %>
+    <span aria-hidden="true"> / </span>
+    <%= link_to "Categories", categories_path %>
+    <span aria-hidden="true"> / </span>
     <%= link_to @product.category.name,
-        category_path(@product.category) %> /
-    <span><%= @product.name %></span>
+        category_path(@product.category) %>
+    <span aria-hidden="true"> / </span>
+    <span aria-current="page"><%= @product.name %></span>
   </nav>
 
   <div class="product-detail">

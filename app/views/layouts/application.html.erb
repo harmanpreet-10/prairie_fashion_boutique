@@ -43,6 +43,42 @@
       </div>
     <% end %>
 
+    <% unless controller_path.start_with?("admin/", "active_admin/", "devise/") ||
+              (controller_name == "products" && action_name == "show") %>
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <%= link_to "Home", root_path %>
+
+        <% if controller_name == "products" && action_name == "index" %>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">Shop</span>
+
+        <% elsif controller_name == "categories" && action_name == "index" %>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">Categories</span>
+
+        <% elsif controller_name == "categories" && action_name == "show" %>
+          <span aria-hidden="true"> / </span>
+          <%= link_to "Categories", categories_path %>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page"><%= @category.name %></span>
+
+        <% elsif controller_name == "carts" %>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">Cart</span>
+
+        <% elsif controller_name == "orders" && action_name == "new" %>
+          <span aria-hidden="true"> / </span>
+          <%= link_to "Cart", cart_path %>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">Checkout</span>
+
+        <% elsif controller_name == "orders" && action_name == "show" %>
+          <span aria-hidden="true"> / </span>
+          <span aria-current="page">Order Confirmation</span>
+        <% end %>
+      </nav>
+    <% end %>
+
     <%= yield %>
 
     <footer class="site-footer">
