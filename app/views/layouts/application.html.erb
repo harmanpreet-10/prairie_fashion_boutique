@@ -1,29 +1,54 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <title><%= content_for(:title) || "Prairie Fashion Boutique" %></title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Prairie Fashion Boutique">
-    <meta name="mobile-web-app-capable" content="yes">
+    <title>Prairie Fashion Boutique</title>
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <%= yield :head %>
+    <%= stylesheet_link_tag "application",
+        "data-turbo-track": "reload" %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
-    <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
-
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="/icon.png">
-
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body>
+    <header class="site-header">
+      <div class="nav-container">
+        <%= link_to "PRAIRIE FASHION",
+            root_path,
+            class: "brand" %>
+
+        <nav aria-label="Main navigation">
+          <%= link_to "Home", root_path %>
+          <%= link_to "Shop", products_path %>
+          <%= link_to "Categories", categories_path %>
+
+          <% cart_count = (session[:cart] || {}).values.sum(&:to_i) %>
+
+          <%= link_to "Cart (#{cart_count})", cart_path %>
+
+          <%= link_to "Admin", admin_root_path %>
+        </nav>
+      </div>
+    </header>
+
+    <% flash.each do |type, message| %>
+      <div class="flash-message" role="status">
+        <%= message %>
+      </div>
+    <% end %>
+
     <%= yield %>
+
+    <footer class="site-footer">
+      <p>Prairie Fashion Boutique</p>
+      <p>Winnipeg, Manitoba, Canada</p>
+      <p>Affordable Fashion. Everyday Confidence.</p>
+    </footer>
   </body>
 </html>

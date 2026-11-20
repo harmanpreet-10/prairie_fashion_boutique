@@ -1,39 +1,69 @@
 
 <main class="store-container">
-  <p>
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
     <%= link_to "Home", root_path %> /
+    <%= link_to "Categories", categories_path %> /
     <%= link_to @product.category.name,
         category_path(@product.category) %> /
-    <%= @product.name %>
-  </p>
+    <span><%= @product.name %></span>
+  </nav>
 
   <div class="product-detail">
-    <div class="product-placeholder">
+    <div class="product-placeholder detail-placeholder">
       Prairie Fashion Boutique
     </div>
 
-    <div>
+    <div class="detail-info">
       <p class="category-label">
         <%= @product.category.name %>
       </p>
 
       <h1><%= @product.name %></h1>
 
-      <h2 class="price">
+      <p class="price">
         <%= number_to_currency(@product.price) %>
-      </h2>
+      </p>
 
+      <h2>Product Description</h2>
       <p><%= @product.description %></p>
 
       <% if @product.stock_quantity.positive? %>
-        <p>In Stock: <%= @product.stock_quantity %></p>
+        <p class="stock in-stock">
+          In Stock:
+          <%= @product.stock_quantity %> available
+        </p>
+
+        <%= form_with url: add_cart_path,
+            method: :post,
+            class: "add-cart-form" do |form| %>
+
+          <%= form.hidden_field :product_id,
+              value: @product.id %>
+
+          <%= form.label :quantity, "Quantity" %>
+
+          <%= form.number_field :quantity,
+              value: 1,
+              min: 1,
+              max: @product.stock_quantity,
+              required: true %>
+
+          <%= form.submit "Add to Cart",
+              class: "shop-button" %>
+        <% end %>
       <% else %>
-        <p>Out of Stock</p>
+        <p class="stock out-of-stock">
+          Currently Out of Stock
+        </p>
       <% end %>
 
-      <%= link_to "Browse More Products",
-          products_path,
-          class: "shop-button" %>
+      <p>
+        <%= link_to "View Shopping Cart", cart_path %>
+      </p>
+
+      <p>
+        <%= link_to "Back to Products", products_path %>
+      </p>
     </div>
   </div>
 </main>

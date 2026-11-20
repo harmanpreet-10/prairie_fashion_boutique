@@ -8,6 +8,13 @@ Rails.application.routes.draw do
   resources :products, only: [:index, :show]
   resources :categories, only: [:index, :show]
 
+  resource :cart, only: [:show] do
+    post "add", to: "carts#add"
+    patch "update_item", to: "carts#update_item"
+    delete "remove", to: "carts#remove"
+    delete "clear", to: "carts#clear"
+  end
+
   get "up" => "rails/health#show",
       as: :rails_health_check
 end

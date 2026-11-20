@@ -1,0 +1,95 @@
+
+<main class="store-container">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <%= link_to "Home", root_path %> /
+    <span>Shopping Cart</span>
+  </nav>
+
+  <h1>My Shopping Cart</h1>
+
+  <% if @cart_items.any? %>
+    <div class="cart-items">
+      <% @cart_items.each do |item| %>
+        <% product = item[:product] %>
+
+        <article class="cart-item">
+          <div>
+            <h2><%= product.name %></h2>
+            <p>
+              Unit Price:
+              <%= number_to_currency(product.price) %>
+            </p>
+            <p>
+              Available Stock:
+              <%= product.stock_quantity %>
+            </p>
+          </div>
+
+          <div>
+            <%= form_with url: update_item_cart_path,
+                method: :patch,
+                class: "cart-quantity-form" do |form| %>
+
+              <%= form.hidden_field :product_id,
+                  value: product.id %>
+
+              <%= form.number_field :quantity,
+                  value: item[:quantity],
+                  min: 0,
+                  max: product.stock_quantity,
+                  aria: { label: "Quantity for #{product.name}" } %>
+
+              <%= form.submit "Update",
+                  class: "shop-button" %>
+            <% end %>
+          </div>
+
+          <div>
+            <p class="price">
+              <%= number_to_currency(item[:line_total]) %>
+            </p>
+
+            <%= button_to "Remove",
+                remove_cart_path(product_id: product.id),
+                method: :delete,
+                class: "remove-button" %>
+          </div>
+        </article>
+      <% end %>
+    </div>
+
+    <section class="cart-summary">
+      <h2>Order Summary</h2>
+
+      <p>
+        Total Items:
+        <%= @cart_items.sum { |item| item[:quantity] } %>
+      </p>
+
+      <h2>
+        Subtotal:
+        <%= number_to_currency(@subtotal) %>
+      </h2>
+
+      <p>Taxes and shipping are not included.</p>
+
+      <%= link_to "Continue Shopping",
+          products_path,
+          class: "shop-button" %>
+
+      <%= button_to "Clear Cart",
+          clear_cart_path,
+          method: :delete,
+          class: "remove-button" %>
+    </section>
+  <% else %>
+    <div class="empty-state">
+      <h2>Your shopping cart is empty</h2>
+      <p>Explore our collection and add something you love.</p>
+
+      <%= link_to "Shop Now",
+          products_path,
+          class: "shop-button" %>
+    </div>
+  <% end %>
+</main>
