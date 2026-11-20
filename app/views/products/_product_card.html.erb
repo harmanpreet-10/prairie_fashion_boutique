@@ -1,0 +1,28 @@
+
+<article class="product-card">
+  <div class="product-placeholder">
+    Prairie Fashion
+  </div>
+
+  <div class="product-info">
+    <p class="category-label">
+      <%= product.category.name %>
+    </p>
+
+    <h3><%= product.name %></h3>
+
+    <p class="price">
+      <%= number_to_currency(product.price) %>
+    </p>
+
+    <% if product.stock_quantity.positive? %>
+      <p class="stock in-stock">In Stock</p>
+    <% else %>
+      <p class="stock out-of-stock">Out of Stock</p>
+    <% end %>
+
+    <%= link_to "View Details",
+        product_path(product),
+        class: "details-button" %>
+  </div>
+</article>

@@ -1,26 +1,25 @@
 
 <main class="store-container">
-  <p>
+  <nav aria-label="Breadcrumb">
     <%= link_to "Home", root_path %> /
     <%= link_to "Categories", categories_path %> /
     <%= @category.name %>
-  </p>
+  </nav>
 
   <h1><%= @category.name %></h1>
   <p><%= @category.description %></p>
 
-  <div class="product-grid">
-    <% @products.each do |product| %>
-      <article class="product-card">
-        <div class="product-info">
-          <h2><%= product.name %></h2>
-          <p><%= number_to_currency(product.price) %></p>
-
-          <%= link_to "View Details",
-              product_path(product),
-              class: "details-button" %>
-        </div>
-      </article>
-    <% end %>
-  </div>
+  <% if @products.any? %>
+    <div class="product-grid">
+      <%= render partial: "products/product_card",
+          collection: @products,
+          as: :product %>
+    </div>
+  <% else %>
+    <div class="empty-state">
+      <h3>No products in this category</h3>
+      <p>Explore our other fashion collections.</p>
+      <%= link_to "Browse Categories", categories_path %>
+    </div>
+  <% end %>
 </main>
