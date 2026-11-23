@@ -1,11 +1,5 @@
 
 <main class="store-container">
-  <nav class="breadcrumbs" aria-label="Breadcrumb">
-    <%= link_to "Home", root_path %> /
-    <%= link_to "Shopping Cart", cart_path %> /
-    <span>Checkout</span>
-  </nav>
-
   <h1>Checkout</h1>
   <p>Complete your information to place your order.</p>
 
@@ -36,8 +30,7 @@
 
       <p>
         <%= form.label :shipping_address, "Shipping Address" %>
-        <%= form.text_area :shipping_address,
-              rows: 4, required: true %>
+        <%= form.text_area :shipping_address, rows: 4, required: true %>
       </p>
 
       <p>
@@ -45,7 +38,7 @@
         <%= form.select :province,
               CanadianSalesTax::PROVINCES.to_a,
               { prompt: "Select your province" },
-              { required: true } %>
+              { required: true, id: "checkout-province" } %>
       </p>
 
       <h2>Order Summary</h2>
@@ -53,8 +46,8 @@
       <% @cart_items.each do |item| %>
         <p>
           <%= item[:product].name %>
-          × <%= item[:quantity] %>
-          — <%= number_to_currency(item[:line_total]) %>
+          &times; <%= item[:quantity] %>
+          &mdash; <%= number_to_currency(item[:line_total]) %>
         </p>
       <% end %>
 
@@ -62,26 +55,30 @@
 
       <p>
         Subtotal:
-        <%= number_to_currency(@order.subtotal) %>
+        <strong><%= number_to_currency(@order.subtotal) %></strong>
       </p>
 
-      <% if CanadianSalesTax::RATES.key?(@order.province) %>
-        <p>GST: <%= number_to_currency(@order.gst_amount) %></p>
-        <p>PST/QST: <%= number_to_currency(@order.pst_amount) %></p>
-        <p>HST: <%= number_to_currency(@order.hst_amount) %></p>
+      <div id="checkout-tax-summary"
+           data-subtotal="<%= @order.subtotal %>"
+           data-rates="<%= CanadianSalesTax::RATES.to_json %>">
+
+        <p>GST: <span id="checkout-gst">$0.00</span></p>
+        <p>PST/QST: <span id="checkout-pst">$0.00</span></p>
+        <p>HST: <span id="checkout-hst">$0.00</span></p>
 
         <h2>
           Estimated Total:
-          <%= number_to_currency(@order.total) %>
+          <span id="checkout-total">
+            <%= number_to_currency(@order.total) %>
+          </span>
         </h2>
-      <% else %>
-        <p>Taxes will be calculated for your province.</p>
-      <% end %>
+      </div>
 
       <p>
         <small>
-          The final tax amount is calculated when you place
-          your order. Shipping is not charged.
+          Tax estimates update when you select a province.
+          Final taxes are calculated on the server when you place
+          your order. Shipping is free.
         </small>
       </p>
 
@@ -89,7 +86,79 @@
     </section>
   <% end %>
 
-  <p>
-    <%= link_to "Back to Cart", cart_path %>
-  </p>
+  <p><%= link_to "Back to Cart", cart_path %></p>
 </main>
+
+<script>
+  (() => {
+    function initializeCheckoutTax() {
+      const province = document.getElementById("checkout-province");
+      const summary = document.getElementById("checkout-tax-summary");
+
+      if (!province || !summary || summary.dataset.initialized === "true") {
+        return;
+      }
+
+      summary.dataset.initialized = "true";
+
+      const subtotalCents = Math.round(
+        Number(summary.dataset.subtotal) * 100
+      );
+
+      const rates = JSON.parse(summary.dataset.rates);
+
+      const currency = (cents) =>
+        new Intl.NumberFormat("en-CA", {
+          style: "currency",
+          currency: "CAD"
+        }).format(cents / 100);
+
+      const calculateTax = (rate) =>
+        Math.round(subtotalCents * Number(rate));
+
+      function updateTaxPreview() {
+        const selectedRates = rates[province.value];
+
+        if (!selectedRates) {
+          document.getElementById("checkout-gst").textContent = "—";
+          document.getElementById("checkout-pst").textContent = "—";
+          document.getElementById("checkout-hst").textContent = "—";
+          document.getElementById("checkout-total").textContent =
+            "Select a province";
+          return;
+        }
+
+        const gst = calculateTax(selectedRates.gst);
+        const pst = calculateTax(selectedRates.pst);
+        const hst = calculateTax(selectedRates.hst);
+
+        document.getElementById("checkout-gst").textContent =
+          currency(gst);
+
+        document.getElementById("checkout-pst").textContent =
+          currency(pst);
+
+        document.getElementById("checkout-hst").textContent =
+          currency(hst);
+
+        document.getElementById("checkout-total").textContent =
+          currency(subtotalCents + gst + pst + hst);
+      }
+
+      province.addEventListener("change", updateTaxPreview);
+      updateTaxPreview();
+    }
+
+    document.addEventListener("turbo:load", initializeCheckoutTax);
+
+    if (document.readyState === "loading") {
+      document.addEventListener(
+        "DOMContentLoaded",
+        initializeCheckoutTax,
+        { once: true }
+      );
+    } else {
+      initializeCheckoutTax();
+    }
+  })();
+</script>
