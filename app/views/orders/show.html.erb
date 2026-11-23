@@ -7,10 +7,16 @@
 
   <section class="cart-summary">
     <h1>Thank You for Your Order!</h1>
-
     <p>Your order has been placed successfully.</p>
 
-    <h2>Order #<%= @order.id %></h2>
+    <h2>Tax Invoice — Order #<%= @order.id %></h2>
+
+    <p>
+      <strong>Order Date:</strong>
+      <%= @order.created_at.strftime("%B %d, %Y") %>
+    </p>
+
+    <h2>Customer Information</h2>
 
     <p>
       <strong>Customer:</strong>
@@ -27,20 +33,69 @@
       <%= @order.shipping_address %>
     </p>
 
+    <p>
+      <strong>Province or Territory:</strong>
+      <%= CanadianSalesTax::PROVINCES.key(@order.province) || "Not recorded" %>
+    </p>
+
     <h2>Purchased Items</h2>
 
-    <% @order.order_items.each do |item| %>
-      <p>
-        <%= item.product.name %>
-        × <%= item.quantity %>
-        — <%= number_to_currency(item.unit_price * item.quantity) %>
-      </p>
-    <% end %>
+    <table class="invoice-table">
+      <thead>
+        <tr>
+          <th scope="col">Product</th>
+          <th scope="col">Quantity</th>
+          <th scope="col">Unit Price</th>
+          <th scope="col">Line Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <% @order.order_items.each do |item| %>
+          <tr>
+            <td><%= item.product.name %></td>
+            <td><%= item.quantity %></td>
+            <td><%= number_to_currency(item.unit_price) %></td>
+            <td>
+              <%= number_to_currency(item.unit_price * item.quantity) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <h2>Invoice Summary</h2>
+
+    <p>
+      <strong>Subtotal:</strong>
+      <%= number_to_currency(@order.subtotal || @order.total) %>
+    </p>
+
+    <p>
+      <strong>GST:</strong>
+      <%= number_to_currency(@order.gst_amount || 0) %>
+    </p>
+
+    <p>
+      <strong>PST/QST:</strong>
+      <%= number_to_currency(@order.pst_amount || 0) %>
+    </p>
+
+    <p>
+      <strong>HST:</strong>
+      <%= number_to_currency(@order.hst_amount || 0) %>
+    </p>
+
+    <p><strong>Shipping:</strong> $0.00</p>
+
+    <hr>
 
     <h2>
-      Order Total:
+      Grand Total:
       <%= number_to_currency(@order.total) %>
     </h2>
+
+    <p>Thank you for shopping with Prairie Fashion Boutique!</p>
 
     <%= link_to "Continue Shopping",
           products_path,

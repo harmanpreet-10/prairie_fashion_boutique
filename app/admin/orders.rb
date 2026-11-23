@@ -11,6 +11,7 @@ ActiveAdmin.register Order do
   filter :id
   filter :customer_name
   filter :email
+  filter :province
   filter :created_at
 
   index title: "Customer Orders" do
@@ -19,6 +20,7 @@ ActiveAdmin.register Order do
 
     column "Customer", :customer_name
     column :email
+    column :province
 
     column "Items" do |order|
       order.order_items.sum(&:quantity)
@@ -41,6 +43,26 @@ ActiveAdmin.register Order do
       row :customer_name
       row :email
       row :shipping_address
+
+      row("Province or Territory") do |order|
+        CanadianSalesTax::PROVINCES.key(order.province) || "Not recorded"
+      end
+
+      row("Subtotal") do |order|
+        number_to_currency(order.subtotal || order.total)
+      end
+
+      row("GST") do |order|
+        number_to_currency(order.gst_amount || 0)
+      end
+
+      row("PST/QST") do |order|
+        number_to_currency(order.pst_amount || 0)
+      end
+
+      row("HST") do |order|
+        number_to_currency(order.hst_amount || 0)
+      end
 
       row("Order Total") do |order|
         number_to_currency(order.total)
