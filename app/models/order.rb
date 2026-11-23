@@ -6,13 +6,20 @@ class Order < ApplicationRecord
   validates :email, presence: true,
                     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :shipping_address, presence: true
-  validates :total, presence: true,
-                    numericality: { greater_than_or_equal_to: 0 }
+  validates :province, inclusion: { in: CanadianSalesTax::RATES.keys }
+
+  validates :subtotal, :total,
+            presence: true,
+            numericality: { greater_than_or_equal_to: 0 }
+
+  validates :gst_amount, :pst_amount, :hst_amount,
+            numericality: { greater_than_or_equal_to: 0 }
 
   def self.ransackable_attributes(auth_object = nil)
     %w[
-      id customer_name email shipping_address
-      total created_at updated_at
+      id customer_name email shipping_address province
+      subtotal gst_amount pst_amount hst_amount total
+      created_at updated_at
     ]
   end
 

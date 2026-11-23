@@ -2,33 +2,26 @@
 class OrdersController < ApplicationController
   class CheckoutError < StandardError; end
 
-  before_action :load_cart_items, only: [:new, :create]
+  before_action :load_cart_items, only: %i[new create]
 
-  # GET /checkout
   def new
-    @order = Order.new
-
     if @cart_items.empty?
-      redirect_to cart_path,
-                  alert: "Your shopping cart is empty."
+      redirect_to cart_path, alert: "Your shopping cart is empty."
       return
     end
 
-    @order.total = @subtotal
+    @order = Order.new(province: "MB")
+    calculate_totals
   end
 
-  # POST /orders
   def create
-    @order = Order.new(order_params)
-
     if @cart_items.empty?
-      redirect_to cart_path,
-                  alert: "Your shopping cart is empty."
+      redirect_to cart_path, alert: "Your shopping cart is empty."
       return
     end
 
-    # FIX: Calculate total BEFORE validating the order.
-    @order.total = @subtotal
+    @order = Order.new(order_params)
+    calculate_totals
 
     unless @order.valid?
       render :new, status: :unprocessable_entity
@@ -37,7 +30,6 @@ class OrdersController < ApplicationController
 
     begin
       Order.transaction do
-        # Lock products in a consistent order.
         locked_items = @cart_items.sort_by do |item|
           item[:product].id
         end.map do |item|
@@ -49,21 +41,16 @@ class OrdersController < ApplicationController
                   "Not enough stock available for #{product.name}."
           end
 
-          {
-            product: product,
-            quantity: quantity
-          }
+          { product: product, quantity: quantity }
         end
 
-        # Recalculate total using current product prices.
-        @order.total = locked_items.sum do |item|
+        @subtotal = locked_items.sum do |item|
           item[:product].price * item[:quantity]
         end
 
-        # Save the order.
+        calculate_totals
         @order.save!
 
-        # Save order items and reduce product stock.
         locked_items.each do |item|
           product = item[:product]
           quantity = item[:quantity]
@@ -80,7 +67,6 @@ class OrdersController < ApplicationController
         end
       end
 
-      # Clear cart only after successful order creation.
       session[:cart] = {}
 
       redirect_to order_path(@order),
@@ -91,15 +77,12 @@ class OrdersController < ApplicationController
            ActiveRecord::RecordNotFound => e
 
       flash.now[:alert] = "Checkout failed: #{e.message}"
-
       load_cart_items
-      @order.total = @subtotal
-
+      calculate_totals
       render :new, status: :unprocessable_entity
     end
   end
 
-  # GET /orders/:id
   def show
     @order = Order.includes(
       order_items: :product
@@ -112,8 +95,29 @@ class OrdersController < ApplicationController
     params.require(:order).permit(
       :customer_name,
       :email,
-      :shipping_address
+      :shipping_address,
+      :province
     )
+  end
+
+  def calculate_totals
+    @order.subtotal = @subtotal
+    @order.gst_amount = 0
+    @order.pst_amount = 0
+    @order.hst_amount = 0
+    @order.total = @subtotal
+
+    return unless CanadianSalesTax::RATES.key?(@order.province)
+
+    tax = CanadianSalesTax.new(
+      subtotal: @subtotal,
+      province: @order.province
+    )
+
+    @order.gst_amount = tax.gst_amount
+    @order.pst_amount = tax.pst_amount
+    @order.hst_amount = tax.hst_amount
+    @order.total = tax.total
   end
 
   def load_cart_items

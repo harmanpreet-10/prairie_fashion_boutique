@@ -10,7 +10,7 @@
   <p>Complete your information to place your order.</p>
 
   <% if @order.errors.any? %>
-    <div class="empty-state">
+    <div class="empty-state" role="alert">
       <h2>Please correct the following errors:</h2>
       <ul>
         <% @order.errors.full_messages.each do |message| %>
@@ -40,6 +40,14 @@
               rows: 4, required: true %>
       </p>
 
+      <p>
+        <%= form.label :province, "Province or Territory" %>
+        <%= form.select :province,
+              CanadianSalesTax::PROVINCES.to_a,
+              { prompt: "Select your province" },
+              { required: true } %>
+      </p>
+
       <h2>Order Summary</h2>
 
       <% @cart_items.each do |item| %>
@@ -50,15 +58,34 @@
         </p>
       <% end %>
 
-      <h2>
-        Order Total:
-        <%= number_to_currency(@subtotal) %>
-      </h2>
+      <hr>
 
-      <p>Taxes and shipping are not included.</p>
+      <p>
+        Subtotal:
+        <%= number_to_currency(@order.subtotal) %>
+      </p>
 
-      <%= form.submit "Place Order",
-            class: "shop-button" %>
+      <% if CanadianSalesTax::RATES.key?(@order.province) %>
+        <p>GST: <%= number_to_currency(@order.gst_amount) %></p>
+        <p>PST/QST: <%= number_to_currency(@order.pst_amount) %></p>
+        <p>HST: <%= number_to_currency(@order.hst_amount) %></p>
+
+        <h2>
+          Estimated Total:
+          <%= number_to_currency(@order.total) %>
+        </h2>
+      <% else %>
+        <p>Taxes will be calculated for your province.</p>
+      <% end %>
+
+      <p>
+        <small>
+          The final tax amount is calculated when you place
+          your order. Shipping is not charged.
+        </small>
+      </p>
+
+      <%= form.submit "Place Order", class: "shop-button" %>
     </section>
   <% end %>
 
