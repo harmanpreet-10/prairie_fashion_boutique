@@ -1,8 +1,7 @@
-
 class ProductsController < ApplicationController
   def index
     @categories = Category.order(:name)
-    @products = Product.includes(:category)
+    @products = Product.includes(:category).with_attached_image
 
     # Search products by name or description
     if params[:search].present?
@@ -26,6 +25,21 @@ class ProductsController < ApplicationController
       @products = @products.where("stock_quantity > 0")
     end
 
+    # Filter newly added and recently updated products
+    cutoff = 3.days.ago
+
+    case params[:filter]
+    when "new"
+      @products = @products.where(
+        "products.created_at >= ?", cutoff
+      )
+    when "updated"
+      @products = @products.where(
+        "products.updated_at >= ? AND products.created_at < ?",
+        cutoff, cutoff
+      )
+    end
+
     # Sort products
     case params[:sort]
     when "price_low"
@@ -43,6 +57,8 @@ class ProductsController < ApplicationController
   end
 
   def show
-    @product = Product.includes(:category).find(params[:id])
+    @product = Product.includes(:category)
+                      .with_attached_image
+                      .find(params[:id])
   end
 end
