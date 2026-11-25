@@ -95,3 +95,34 @@ puts "Database seeding completed successfully!"
 puts "Categories: #{Category.count}"
 puts "Products: #{Product.count}"
 puts "Total category/product records: #{Category.count + Product.count}"
+
+# Editable informational pages
+
+Page.find_or_create_by!(slug: "about-us") do |page|
+  page.title = "About Us"
+  page.content = <<~TEXT
+    Welcome to Prairie Fashion Boutique!
+
+    We are a Winnipeg-based fashion boutique dedicated to offering affordable, stylish, and comfortable clothing.
+
+    Our goal is to help customers express their personal style through everyday fashion. Our collection includes tops, bottoms, dresses, and accessories.
+
+    We believe that fashion should be accessible, enjoyable, and suitable for every occasion.
+
+    Thank you for visiting Prairie Fashion Boutique.
+  TEXT
+end
+
+Page.find_or_create_by!(slug: "contact-us") do |page|
+  page.title = "Contact Us"
+  page.content = <<~TEXT
+    We would love to hear from you!
+
+    If you have questions about our products, orders, or shopping experience, please contact our customer service team.
+
+    Prairie Fashion Boutique
+    Winnipeg, Manitoba, Canada
+
+    Thank you for choosing Prairie Fashion Boutique.
+  TEXT
+end
