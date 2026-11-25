@@ -12,9 +12,15 @@
   </nav>
 
   <div class="product-detail">
-    <div class="product-placeholder detail-placeholder">
-      Prairie Fashion Boutique
-    </div>
+    <% if @product.image.attached? %>
+      <%= image_tag @product.image.variant(:large),
+          alt: @product.name,
+          class: "product-detail-image" %>
+    <% else %>
+      <div class="product-placeholder detail-placeholder">
+        Prairie Fashion Boutique
+      </div>
+    <% end %>
 
     <div class="detail-info">
       <p class="category-label">
