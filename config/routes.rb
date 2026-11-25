@@ -8,6 +8,9 @@ Rails.application.routes.draw do
   resources :products, only: [:index, :show]
   resources :categories, only: [:index, :show]
 
+  get "about", to: "pages#about", as: :about
+  get "contact", to: "pages#contact", as: :contact
+
   resource :cart, only: [:show] do
     post "add", to: "carts#add"
     patch "update_item", to: "carts#update_item"
